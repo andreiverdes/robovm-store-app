@@ -28,6 +28,7 @@ public class Product {
     private ProductType type;
     private List<ProductColor> colors;
     private List<ProductSize> sizes;
+    private List<ProductReview> reviews;
 
     private final Random random = new Random();
     private int imageIndex = -1;
@@ -62,6 +63,10 @@ public class Product {
 
     public List<ProductSize> getSizes() {
         return sizes;
+    }
+
+    public List<ProductReview> getReviews(){
+        return this.reviews;
     }
 
     public List<String> getImageUrls() {
