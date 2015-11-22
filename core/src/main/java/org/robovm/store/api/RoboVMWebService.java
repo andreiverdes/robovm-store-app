@@ -15,13 +15,21 @@
  */
 package org.robovm.store.api;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.robovm.store.model.Basket;
-import org.robovm.store.model.Product;
-import org.robovm.store.model.User;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.OkHttpClient;
+import org.apache.commons.io.IOUtils;
+import org.robovm.store.model.*;
 import org.robovm.store.util.Action;
+import org.robovm.store.util.Countries;
 import org.robovm.store.util.ImageCache;
 import org.robovm.store.util.Objects;
 
@@ -45,7 +53,7 @@ public class RoboVMWebService {
 
     private static final String API_URL = "https://store-app.robovm.com/api/";
     private static final String API_TEST_URL = "https://store-app.robovm.com/test/";
-
+    private static final boolean MOCK_REVIEWS = true;
     private RoboVMAPI api;
 
     private AuthToken authToken;
@@ -127,6 +135,11 @@ public class RoboVMWebService {
                         }
                     }
 
+                    //I know, this is dirty...I'm thinking about interceptors
+                    if(MOCK_REVIEWS && products != null){
+                        addMockedReviews(products);
+                    }
+
                     RoboVMWebService.this.products = products;
                     if (products == null) {
                         // Return empty list in case of failure.
@@ -142,6 +155,32 @@ public class RoboVMWebService {
                     ActionWrapper.WRAPPER.invoke(completion, new ArrayList<>());
                 }
             });
+        }
+    }
+
+    private void addMockedReviews(List<Product> products) {
+        for (Product product : products){
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:sss").create();
+            Type listType = new TypeToken<ArrayList<ProductReview>>() {}.getType();
+            List<ProductReview> reviews = null;
+            InputStream inputStream = null;
+            if(product.getId().equals("robovm-t-shirt-male")){
+                inputStream = RoboVMWebService.class.getResourceAsStream("/mock_men_tshirt_reviews.json");
+            } else if (product.getId().equals("robovm-t-shirt-female")){
+                inputStream = RoboVMWebService.class.getResourceAsStream("/mock_women_tshirt_reviews.json");
+            }
+            if(inputStream != null) {
+                try {
+                    reviews = gson.fromJson(IOUtils.toString(inputStream, Charset.defaultCharset()), listType);
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(reviews == null){
+                reviews = new ArrayList<>();
+            }
+            product.setReviews(reviews);
         }
     }
 

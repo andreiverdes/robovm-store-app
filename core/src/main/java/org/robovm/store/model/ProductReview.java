@@ -1,10 +1,13 @@
 package org.robovm.store.model;
 
+import java.util.Date;
+
 /**
  * Created by andrei on 21/11/15.
  */
 public class ProductReview {
     private int stars;
+    private Date date;
     private String email;
     private String fullName;
     private String comment;
@@ -39,5 +42,13 @@ public class ProductReview {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

@@ -97,4 +97,8 @@ public class Product {
     public String toString() {
         return name;
     }
+
+    public void setReviews(List<ProductReview> productReviews) {
+        this.reviews = productReviews;
+    }
 }
