@@ -23,11 +23,13 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
+import de.greenrobot.event.EventBus;
 import org.robovm.store.api.RoboVMWebService;
 import org.robovm.store.api.RoboVMWebService.ActionWrapper;
 import org.robovm.store.fragments.*;
 import org.robovm.store.model.Product;
 import org.robovm.store.util.Action;
+import org.robovm.store.util.EventSetupActionBar;
 import org.robovm.store.util.ImageCache;
 import org.robovm.store.util.Images;
 
@@ -61,6 +63,18 @@ public class StoreAppActivity extends Activity {
             baseFragment = productFragment.getId();
             switchScreens(productFragment, false, true);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -145,12 +159,13 @@ public class StoreAppActivity extends Activity {
     }
 
     public void showProductDetail(Product product, int itemVerticalOffset) {
-        ProductDetailsFragment productDetails = new ProductDetailsFragment(product, itemVerticalOffset);
-        productDetails.setAddToBasketListener((order) -> {
-            RoboVMWebService.getInstance().getBasket().add(order);
-            setupActionBar();
-        });
-        switchScreens(productDetails);
+        ProductFragment productFragment = new ProductFragment(product, itemVerticalOffset);
+//        ProductDetailsFragment productDetails = new ProductDetailsFragment(product, itemVerticalOffset);
+//        productDetails.setAddToBasketListener((order) -> {
+//            RoboVMWebService.getInstance().getBasket().add(order);
+//            setupActionBar();
+//        });
+        switchScreens(productFragment);
     }
 
     public void setupActionBar() {
@@ -159,6 +174,10 @@ public class StoreAppActivity extends Activity {
 
     public void setupActionBar(boolean showUp) {
         getActionBar().setDisplayHomeAsUpEnabled(showUp);
+    }
+
+    public void onEvent(EventSetupActionBar pEventSetupActionBar){
+        this.setupActionBar();
     }
 
     public void showBasket() {

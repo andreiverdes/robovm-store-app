@@ -53,7 +53,6 @@ public class ProductDetailsFragment extends Fragment implements ViewTreeObserver
     private final Random random = new Random();
     private int currentIndex;
     private boolean shouldAnimatePop;
-    private BadgeDrawable basketBadge;
     private List<String> images = new ArrayList<>();
     private boolean cached;
     private int slidingDelta;
@@ -144,18 +143,6 @@ public class ProductDetailsFragment extends Fragment implements ViewTreeObserver
         if (kenBurnsMovement != null) {
             kenBurnsMovement.cancel();
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu, menu);
-        MenuItem cartItem = menu.findItem(R.id.cart_menu_item);
-        cartItem.setIcon(basketBadge = new BadgeDrawable(cartItem.getIcon()));
-
-        Basket basket = RoboVMWebService.getInstance().getBasket();
-        basketBadge.setCount(basket.size());
-        basket.addOnBasketChangeListener(() -> basketBadge.setCountAnimated(basket.size()));
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

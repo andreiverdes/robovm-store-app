@@ -2,4 +2,6 @@
     <string name="app_name">RoboVM Store App</string>
     <string name="brag_on">Brag on:</string>
     <string name="brag_to_friends">Brag to Friends</string>
+    <string name="tab_title_reviews">Reviews</string>
+    <string name="tab_title_details">Details</string>
 </resources>
