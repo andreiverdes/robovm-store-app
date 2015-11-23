@@ -2,20 +2,20 @@
   {
     "stars":3,
     "date":"2012-07-10T16:02:48.440Z",
-    "email":"bugs.bunny@looneytunes.com",
-    "fullName":"Bugs Bunny",
-    "comment":"Uhhmmm...What's up doc?"
+    "email":"lola.bunny@looneytunes.com",
+    "fullName":"Lola Bunny",
+    "comment":"Nice playin' with ya."
   },{
-    "stars":3,
+    "stars":2,
     "date":"2012-07-10T16:02:48.440Z",
-    "email":"bugs.bunny@looneytunes.com",
-    "fullName":"Bugs Bunny",
-    "comment":"Uhhmmm...What's up doc?"
+    "email":"granny@looneytunes.com",
+    "fullName":"Granny",
+    "comment":"Bla bla something about the bird and the cat...blabla. It's too late :D"
   },{
-    "stars":3,
+    "stars":5,
     "date":"2012-07-10T16:02:48.440Z",
-    "email":"bugs.bunny@looneytunes.com",
-    "fullName":"Bugs Bunny",
-    "comment":"Uhhmmm...What's up doc?"
+    "email":"mellisa.duck@looneytunes.com",
+    "fullName":"Mellisa Duck",
+    "comment":"Daffy is so handsome! Ha ha!"
   }
 ]
