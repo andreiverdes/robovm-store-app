@@ -4,4 +4,5 @@
     <string name="brag_to_friends">Brag to Friends</string>
     <string name="tab_title_reviews">Reviews</string>
     <string name="tab_title_details">Details</string>
+    <string name="reviews_list_empty">This product has no reviews :(</string>
 </resources>

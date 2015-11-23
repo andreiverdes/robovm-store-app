@@ -29,7 +29,6 @@ import com.squareup.okhttp.OkHttpClient;
 import org.apache.commons.io.IOUtils;
 import org.robovm.store.model.*;
 import org.robovm.store.util.Action;
-import org.robovm.store.util.Countries;
 import org.robovm.store.util.ImageCache;
 import org.robovm.store.util.Objects;
 
@@ -66,12 +65,21 @@ public class RoboVMWebService {
     }
 
     public RoboVMWebService setup(boolean test) {
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
+        if(MOCK_REVIEWS){
+            Gson gson = new GsonBuilder()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:sss")
+                    .create();
+            OkHttpClient okHttpClient = new OkHttpClient();
+            okHttpClient.interceptors().add(new MockReviewsInterceptor());
+            retrofitBuilder.client(okHttpClient);
+            retrofitBuilder.addConverterFactory(GsonConverterFactory.create(gson));
+        }
         // Create a REST adapter which points to the RoboVM API.
-        Retrofit retrofit = new Retrofit.Builder()
+        Retrofit retrofit = retrofitBuilder
                 .baseUrl(test ? API_TEST_URL : API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         // Create an instance of our RoboVM API interface.
         api = retrofit.create(RoboVMAPI.class);
 
@@ -135,11 +143,6 @@ public class RoboVMWebService {
                         }
                     }
 
-                    //I know, this is dirty...I'm thinking about interceptors
-                    if(MOCK_REVIEWS && products != null){
-                        addMockedReviews(products);
-                    }
-
                     RoboVMWebService.this.products = products;
                     if (products == null) {
                         // Return empty list in case of failure.
@@ -155,32 +158,6 @@ public class RoboVMWebService {
                     ActionWrapper.WRAPPER.invoke(completion, new ArrayList<>());
                 }
             });
-        }
-    }
-
-    private void addMockedReviews(List<Product> products) {
-        for (Product product : products){
-            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:sss").create();
-            Type listType = new TypeToken<ArrayList<ProductReview>>() {}.getType();
-            List<ProductReview> reviews = null;
-            InputStream inputStream = null;
-            if(product.getId().equals("robovm-t-shirt-male")){
-                inputStream = RoboVMWebService.class.getResourceAsStream("/mock_men_tshirt_reviews.json");
-            } else if (product.getId().equals("robovm-t-shirt-female")){
-                inputStream = RoboVMWebService.class.getResourceAsStream("/mock_women_tshirt_reviews.json");
-            }
-            if(inputStream != null) {
-                try {
-                    reviews = gson.fromJson(IOUtils.toString(inputStream, Charset.defaultCharset()), listType);
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(reviews == null){
-                reviews = new ArrayList<>();
-            }
-            product.setReviews(reviews);
         }
     }
 
