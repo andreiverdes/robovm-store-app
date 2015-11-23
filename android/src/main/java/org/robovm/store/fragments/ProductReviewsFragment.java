@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,10 @@ import java.util.List;
 public class ProductReviewsFragment extends Fragment{
 
     private ListView mReviewsListView;
+    private ImageButton mFabButtonView;
     private View mEmptyListView;
     private final List<ProductReview> mReviews;
+    private ProductReview mPersonalReview;
     private ReviewsAdapter mReviewsAdapter;
 
     public ProductReviewsFragment(){
@@ -47,12 +50,33 @@ public class ProductReviewsFragment extends Fragment{
     private void injectViews(View pView){
         this.mReviewsListView = ((ListView) pView.findViewById(R.id.reviews_list));
         this.mEmptyListView = pView.findViewById(R.id.empty_view);
+        this.mFabButtonView = ((ImageButton) pView.findViewById(R.id.fab));
     }
 
     private void afterViews(){
+        this.mPersonalReview = this.getPersonalReview();
         this.mReviewsAdapter = new ReviewsAdapter(getActivity(), mReviews);
         this.mReviewsListView.setAdapter(mReviewsAdapter);
         this.mReviewsListView.setEmptyView(mEmptyListView);
+        if(mPersonalReview != null){
+            mFabButtonView.setImageResource(R.drawable.ic_action_image_edit);
+        }
+        this.mFabButtonView.setOnClickListener(v ->
+                AddEditReviewFragment.newInstance(mPersonalReview)
+                    .show(getFragmentManager(), null)
+        );
+    }
+
+    private ProductReview getPersonalReview(){
+        if(LoginFragment.ROBOVM_ACCOUNT_EMAIL != null
+                && Patterns.EMAIL_ADDRESS.matcher(LoginFragment.ROBOVM_ACCOUNT_EMAIL).matches()){
+            for (int i = 0; i < mReviews.size(); i++) {
+                if(mReviews.get(i).getEmail().equals(LoginFragment.ROBOVM_ACCOUNT_EMAIL)){
+                    return mReviews.get(i);
+                }
+            }
+        }
+        return null;
     }
 
     public static class ReviewsAdapter extends BaseAdapter{
