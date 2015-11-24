@@ -37,9 +37,7 @@ import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
-import retrofit.http.Body;
-import retrofit.http.GET;
-import retrofit.http.POST;
+import retrofit.http.*;
 
 public class RoboVMWebService {
     private static final RoboVMWebService instance = new RoboVMWebService();
@@ -183,6 +181,22 @@ public class RoboVMWebService {
         });
     }
 
+    public void createReview(ProductReview productReview, Action<ReviewResponse> completion){
+        Objects.requireNonNull(productReview, "productReview");
+        Objects.requireNonNull(completion);
+        products = null;
+        api.createReview(new ReviewRequest(productReview))
+                .enqueue(new SimpleCallback<>(completion));
+    }
+
+    public void updateReview(ProductReview productReview, Action<ReviewResponse> completion){
+        Objects.requireNonNull(productReview, "productReview");
+        Objects.requireNonNull(completion);
+        products = null;
+        api.updateReview(productReview.getId(), new ReviewRequest(productReview))
+                .enqueue(new SimpleCallback<>(completion));
+    }
+
     public void preloadProductImages() {
         if (products != null) {
             new Thread(() -> {
@@ -220,6 +234,12 @@ public class RoboVMWebService {
 
         @POST("order")
         Call<APIResponse> order(@Body OrderRequest body);
+
+        @POST("review")
+        Call<ReviewResponse> createReview(@Body ReviewRequest body);
+
+        @PUT("review/{id}")
+        Call<ReviewResponse> updateReview(@Path("id") String id, @Body ReviewRequest body);
     }
 
     public static abstract class ActionWrapper {
@@ -231,5 +251,29 @@ public class RoboVMWebService {
         };
 
         public abstract <T> void invoke(Action<T> action, T result);
+    }
+
+    public static class SimpleCallback<T extends APIResponse> implements Callback<T> {
+
+        private Action<T> completion;
+
+        public SimpleCallback(Action<T> completion){
+            this.completion = completion;
+        }
+
+        @Override
+        public void onResponse(Response<T> response, Retrofit retrofit) {
+            if (response.isSuccess()) {
+                ActionWrapper.WRAPPER.invoke(completion, response.body());
+            } else {
+                ActionWrapper.WRAPPER.invoke(completion, null);
+            }
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+            t.printStackTrace();
+            ActionWrapper.WRAPPER.invoke(completion, null);
+        }
     }
 }

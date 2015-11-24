@@ -24,6 +24,7 @@ import java.util.Date;
 public class AddEditReviewFragment extends DialogFragment {
 
     public static final String TAG_STARS = "tag_stars";
+    public static final String TAG_PRODUCT_ID = "tag_product_id";
     public static final String TAG_FULL_NAME = "tag_full_name";
     public static final String TAG_COMMENT = "tag_comment";
 
@@ -45,6 +46,7 @@ public class AddEditReviewFragment extends DialogFragment {
         if(productReview != null) {
             Bundle bundle = new Bundle();
             bundle.putInt(TAG_STARS, productReview.getStars());
+            bundle.putString(TAG_PRODUCT_ID, productReview.getProductId());
             bundle.putString(TAG_FULL_NAME, productReview.getFullName());
             bundle.putString(TAG_COMMENT, productReview.getComment());
             fragment.setArguments(bundle);
@@ -120,6 +122,7 @@ public class AddEditReviewFragment extends DialogFragment {
             this.mRatingBarView.setRating(getArguments().getInt(TAG_STARS, 0));
             this.mFullNameEditText.setText(getArguments().getString(TAG_FULL_NAME, ""));
             this.mCommentEditText.setText(getArguments().getString(TAG_COMMENT, ""));
+            this.mCurrentReview.setProductId(getArguments().getString(TAG_PRODUCT_ID, null));
         }
     }
 

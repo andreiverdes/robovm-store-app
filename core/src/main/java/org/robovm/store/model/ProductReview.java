@@ -6,11 +6,21 @@ import java.util.Date;
  * Created by andrei on 21/11/15.
  */
 public class ProductReview {
+    private String id;
+    private String productId;
     private int stars;
     private Date date;
     private String email;
     private String fullName;
     private String comment;
+
+    public String getId() {
+        return id;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
 
     public int getStars() {
         return stars;
@@ -50,5 +60,9 @@ public class ProductReview {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }
