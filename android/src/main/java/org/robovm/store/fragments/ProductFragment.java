@@ -91,7 +91,7 @@ public class ProductFragment extends Fragment {
                     });
                     return productDetails;
                 }
-                case 1: return new ProductReviewsFragment(mProduct.getReviews());
+                case 1: return new ProductReviewsFragment(mProduct.getId(), mProduct.getReviews());
             }
             return null;
         }

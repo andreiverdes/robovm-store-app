@@ -65,4 +65,8 @@ public class ProductReview {
     public void setProductId(String productId) {
         this.productId = productId;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

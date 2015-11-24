@@ -13,8 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Toast;
+import de.greenrobot.event.EventBus;
 import org.robovm.store.R;
 import org.robovm.store.model.ProductReview;
+import org.robovm.store.util.EventCreateReview;
+import org.robovm.store.util.EventUpdateReview;
 
 import java.util.Date;
 
@@ -25,8 +28,10 @@ public class AddEditReviewFragment extends DialogFragment {
 
     public static final String TAG_STARS = "tag_stars";
     public static final String TAG_PRODUCT_ID = "tag_product_id";
+    public static final String TAG_REVIEW_ID = "tag_review_id";
     public static final String TAG_FULL_NAME = "tag_full_name";
     public static final String TAG_COMMENT = "tag_comment";
+    public static final String TAG_NEW_REVIEW = "tag_new_review";
 
 
     private RatingBar mRatingBarView;
@@ -34,23 +39,27 @@ public class AddEditReviewFragment extends DialogFragment {
     private EditText mCommentEditText;
 
     private ProductReview mCurrentReview;
+    private boolean mIsNewReview;
 
     public AddEditReviewFragment(){
         this.mCurrentReview = new ProductReview();
     }
-    public static AddEditReviewFragment newInstance() {
-        return newInstance(null);
+    public static AddEditReviewFragment newInstance(String pProductId) {
+        return newInstance(pProductId, null);
     }
-    public static AddEditReviewFragment newInstance(ProductReview productReview){
+    public static AddEditReviewFragment newInstance(String pProductId, ProductReview productReview){
         AddEditReviewFragment fragment = new AddEditReviewFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(TAG_PRODUCT_ID, pProductId);
+        bundle.putBoolean(TAG_NEW_REVIEW, true);
         if(productReview != null) {
-            Bundle bundle = new Bundle();
+            bundle.putBoolean(TAG_NEW_REVIEW, false);
             bundle.putInt(TAG_STARS, productReview.getStars());
-            bundle.putString(TAG_PRODUCT_ID, productReview.getProductId());
+            bundle.putString(TAG_REVIEW_ID, productReview.getId());
             bundle.putString(TAG_FULL_NAME, productReview.getFullName());
             bundle.putString(TAG_COMMENT, productReview.getComment());
-            fragment.setArguments(bundle);
         }
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -92,7 +101,7 @@ public class AddEditReviewFragment extends DialogFragment {
                         mCurrentReview.setEmail(LoginFragment.ROBOVM_ACCOUNT_EMAIL);
                         mCurrentReview.setStars(mRatingBarView.getNumStars());
                         dialog.dismiss();
-                        if(getArguments() == null){ //if we haven't passed as an argument our existing review
+                        if(mIsNewReview){
                             createReview();
                         } else {
                             updateReview();
@@ -104,11 +113,11 @@ public class AddEditReviewFragment extends DialogFragment {
     }
 
     private void createReview(){
-
+        EventBus.getDefault().post(new EventCreateReview(mCurrentReview));
     }
 
     private void updateReview(){
-
+        EventBus.getDefault().post(new EventUpdateReview(mCurrentReview));
     }
 
     private void injectViews(View pView){
@@ -123,6 +132,8 @@ public class AddEditReviewFragment extends DialogFragment {
             this.mFullNameEditText.setText(getArguments().getString(TAG_FULL_NAME, ""));
             this.mCommentEditText.setText(getArguments().getString(TAG_COMMENT, ""));
             this.mCurrentReview.setProductId(getArguments().getString(TAG_PRODUCT_ID, null));
+            this.mCurrentReview.setId(getArguments().getString(TAG_REVIEW_ID, null));
+            this.mIsNewReview = getArguments().getBoolean(TAG_NEW_REVIEW, true);
         }
     }
 

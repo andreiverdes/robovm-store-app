@@ -44,6 +44,7 @@ public class MockReviewsInterceptor implements Interceptor, Action<Product> {
                     .build();
         } else if(isCreateReview(request)){
             ProductReview productReview = getProductReview(request);
+            productReview.setId("blabla_some_id");
             List<ProductReview> reviews = mReviewsCache.get(productReview.getProductId());
             if(reviews != null){
                 reviews.add(0, productReview);
@@ -53,7 +54,8 @@ public class MockReviewsInterceptor implements Interceptor, Action<Product> {
             List<ProductReview> reviews = mReviewsCache.get(productReview.getProductId());
             if(reviews != null){
                 for(ProductReview itemProductReview : reviews){
-                    if(itemProductReview.getId().equals(productReview.getId())){
+                    if(itemProductReview.getId() != null && productReview.getId() != null
+                            && itemProductReview.getId().equals(productReview.getId())){
                         reviews.set(reviews.indexOf(itemProductReview), productReview);
                     }
                 }

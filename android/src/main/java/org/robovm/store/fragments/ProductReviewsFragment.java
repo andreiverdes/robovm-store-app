@@ -2,17 +2,18 @@ package org.robovm.store.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import de.greenrobot.event.EventBus;
 import org.robovm.store.R;
+import org.robovm.store.model.Product;
 import org.robovm.store.model.ProductReview;
+import org.robovm.store.util.EventRefreshReviewsList;
 import org.robovm.store.util.Gravatar;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public class ProductReviewsFragment extends Fragment{
     private ListView mReviewsListView;
     private ImageButton mFabButtonView;
     private View mEmptyListView;
-    private final List<ProductReview> mReviews;
+    private String mProductId;
+    private List<ProductReview> mReviews;
     private ProductReview mPersonalReview;
     private ReviewsAdapter mReviewsAdapter;
 
@@ -34,17 +36,27 @@ public class ProductReviewsFragment extends Fragment{
         this.mReviews = new ArrayList<>();
     }
 
-    public ProductReviewsFragment(List<ProductReview> pReviews) {
+    public ProductReviewsFragment(String pProductId, List<ProductReview> pReviews) {
+        this.mProductId = pProductId;
         this.mReviews = pReviews;
     }
 
     @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.product_reviews_list, null, true);
         this.injectViews(view);
         this.afterViews();
         return view;
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
     }
 
     private void injectViews(View pView){
@@ -55,16 +67,20 @@ public class ProductReviewsFragment extends Fragment{
 
     private void afterViews(){
         this.mPersonalReview = this.getPersonalReview();
-        this.mReviewsAdapter = new ReviewsAdapter(getActivity(), mReviews);
+        this.mReviewsAdapter = new ReviewsAdapter(getActivity(), mProductId, mReviews);
         this.mReviewsListView.setAdapter(mReviewsAdapter);
         this.mReviewsListView.setEmptyView(mEmptyListView);
-        if(mPersonalReview != null){
-            mFabButtonView.setImageResource(R.drawable.ic_action_image_edit);
-        }
+        setFabIconEdit();
         this.mFabButtonView.setOnClickListener(v ->
-                AddEditReviewFragment.newInstance(mPersonalReview)
+                AddEditReviewFragment.newInstance(mProductId, mPersonalReview)
                     .show(getFragmentManager(), null)
         );
+    }
+
+    private void setFabIconEdit() {
+        if(mPersonalReview != null){
+            mFabButtonView.setImageResource(R.drawable.ic_content_create);
+        }
     }
 
     private ProductReview getPersonalReview(){
@@ -78,12 +94,25 @@ public class ProductReviewsFragment extends Fragment{
         return null;
     }
 
+    public void onEventMainThread(EventRefreshReviewsList pEvent){
+        for(Product product : pEvent.getProducts()){
+            if(product.getId().equals(mProductId)){
+                mReviews = product.getReviews();
+                break;
+            }
+        }
+        this.mReviewsAdapter.update(mReviews);
+        this.mPersonalReview = this.getPersonalReview();
+        setFabIconEdit();
+    }
     public static class ReviewsAdapter extends BaseAdapter{
 
         private LayoutInflater mLayoutInflater;
         private List<ProductReview> mReviews;
+        private String mProductId;
 
-        public ReviewsAdapter(Context pContext, List<ProductReview> pReviews){
+        public ReviewsAdapter(Context pContext, String pProductId, List<ProductReview> pReviews){
+            this.mProductId = pProductId;
             this.mLayoutInflater = ((LayoutInflater) pContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
             this.mReviews = pReviews == null ? new ArrayList<>() : pReviews;
         }
@@ -128,6 +157,11 @@ public class ProductReviewsFragment extends Fragment{
                     pImageView.setImageResource(R.drawable.icon);
                 }
             });
+        }
+
+        public void update(List<ProductReview> pReviews) {
+            this.mReviews = pReviews;
+            this.notifyDataSetChanged();
         }
 
         public static class ViewHolder{

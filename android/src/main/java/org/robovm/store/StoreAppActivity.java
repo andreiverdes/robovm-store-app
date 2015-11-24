@@ -28,10 +28,7 @@ import org.robovm.store.api.RoboVMWebService;
 import org.robovm.store.api.RoboVMWebService.ActionWrapper;
 import org.robovm.store.fragments.*;
 import org.robovm.store.model.Product;
-import org.robovm.store.util.Action;
-import org.robovm.store.util.EventSetupActionBar;
-import org.robovm.store.util.ImageCache;
-import org.robovm.store.util.Images;
+import org.robovm.store.util.*;
 
 public class StoreAppActivity extends Activity {
     private int baseFragment;
@@ -178,6 +175,30 @@ public class StoreAppActivity extends Activity {
 
     public void onEvent(EventSetupActionBar pEventSetupActionBar){
         this.setupActionBar();
+    }
+
+    public void onEvent(EventCreateReview pEventCreateReview){
+        RoboVMWebService.getInstance().createReview(pEventCreateReview.getReview(), reviewResponse -> {
+            //ignore response
+            //refresh reviews
+            refreshProducts();
+        });
+    }
+
+    public void onEvent(EventUpdateReview pEventUpdateReview){
+        RoboVMWebService.getInstance().updateReview(pEventUpdateReview.getReview(), reviewResponse -> {
+            //ignore response
+            //refresh reviews
+            refreshProducts();
+        });
+    }
+
+    private void refreshProducts() {
+        RoboVMWebService.getInstance().getProducts(products -> {
+            if(products != null) {
+                EventBus.getDefault().post(new EventRefreshReviewsList(products));
+            }
+        });
     }
 
     public void showBasket() {

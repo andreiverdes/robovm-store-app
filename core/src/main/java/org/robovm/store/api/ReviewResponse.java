@@ -8,4 +8,8 @@ import org.robovm.store.model.ProductReview;
 public class ReviewResponse extends APIResponse {
 
     ProductReview productReview;
+
+    public ProductReview getReview() {
+        return productReview;
+    }
 }
