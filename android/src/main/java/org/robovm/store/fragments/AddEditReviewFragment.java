@@ -99,7 +99,7 @@ public class AddEditReviewFragment extends DialogFragment {
                         mCurrentReview.setComment(mCommentEditText.getText().toString());
                         mCurrentReview.setDate(new Date());
                         mCurrentReview.setEmail(LoginFragment.ROBOVM_ACCOUNT_EMAIL);
-                        mCurrentReview.setStars(mRatingBarView.getNumStars());
+                        mCurrentReview.setStars((int)mRatingBarView.getRating());
                         dialog.dismiss();
                         if(mIsNewReview){
                             createReview();
@@ -127,6 +127,7 @@ public class AddEditReviewFragment extends DialogFragment {
     }
 
     private void afterViews(){
+        this.mRatingBarView.setStepSize(1f);
         if(getArguments() != null){
             this.mRatingBarView.setRating(getArguments().getInt(TAG_STARS, 0));
             this.mFullNameEditText.setText(getArguments().getString(TAG_FULL_NAME, ""));
