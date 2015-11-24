@@ -5,4 +5,7 @@
     <string name="tab_title_reviews">Reviews</string>
     <string name="tab_title_details">Details</string>
     <string name="reviews_list_empty">This product has no reviews :(</string>
+    <string name="dialog_add_review_title">Review</string>
+    <string name="dialog_add_review_positive">OK</string>
+    <string name="dialog_add_review_negative">Cancel</string>
 </resources>

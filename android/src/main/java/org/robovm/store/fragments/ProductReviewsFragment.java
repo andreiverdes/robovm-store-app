@@ -68,8 +68,7 @@ public class ProductReviewsFragment extends Fragment{
     }
 
     private ProductReview getPersonalReview(){
-        if(LoginFragment.ROBOVM_ACCOUNT_EMAIL != null
-                && Patterns.EMAIL_ADDRESS.matcher(LoginFragment.ROBOVM_ACCOUNT_EMAIL).matches()){
+        if(LoginFragment.isRoboVMAccountEmailValid()){
             for (int i = 0; i < mReviews.size(); i++) {
                 if(mReviews.get(i).getEmail().equals(LoginFragment.ROBOVM_ACCOUNT_EMAIL)){
                     return mReviews.get(i);

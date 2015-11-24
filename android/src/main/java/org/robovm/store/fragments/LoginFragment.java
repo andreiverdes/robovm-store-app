@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,13 +56,19 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (ROBOVM_ACCOUNT_EMAIL == null || ROBOVM_ACCOUNT_EMAIL.isEmpty()) {
+        if (isRoboVMAccountEmailValid()) {
             return createInstructions(inflater, container, savedInstanceState);
         }
         return createLoginView(inflater, container, savedInstanceState);
     }
 
-    private View createInstructions(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public static boolean isRoboVMAccountEmailValid(){
+        return ROBOVM_ACCOUNT_EMAIL != null
+                && !ROBOVM_ACCOUNT_EMAIL.isEmpty()
+                && Patterns.EMAIL_ADDRESS.matcher(ROBOVM_ACCOUNT_EMAIL).matches();
+    }
+
+    public static View createInstructions(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.prefill_robovm_account_instructions, null);
         TextView textView = (TextView) view.findViewById(R.id.codeTextView);
         Spanned coloredText = Html.fromHtml(
