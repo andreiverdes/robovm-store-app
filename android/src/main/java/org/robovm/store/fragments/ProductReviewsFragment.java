@@ -72,7 +72,7 @@ public class ProductReviewsFragment extends Fragment{
         this.mReviewsListView.setEmptyView(mEmptyListView);
         setFabIconEdit();
         this.mFabButtonView.setOnClickListener(v ->
-                AddEditReviewFragment.newInstance(mProductId, mPersonalReview)
+                AddEditReviewDialogFragment.newInstance(mProductId, mPersonalReview)
                     .show(getFragmentManager(), null)
         );
     }

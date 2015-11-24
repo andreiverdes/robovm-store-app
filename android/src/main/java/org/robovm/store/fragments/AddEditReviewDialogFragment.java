@@ -3,12 +3,9 @@ package org.robovm.store.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
@@ -24,7 +21,7 @@ import java.util.Date;
 /**
  * Created by andrei on 24/11/15.
  */
-public class AddEditReviewFragment extends DialogFragment {
+public class AddEditReviewDialogFragment extends DialogFragment {
 
     public static final String TAG_STARS = "tag_stars";
     public static final String TAG_PRODUCT_ID = "tag_product_id";
@@ -41,14 +38,14 @@ public class AddEditReviewFragment extends DialogFragment {
     private ProductReview mCurrentReview;
     private boolean mIsNewReview;
 
-    public AddEditReviewFragment(){
+    public AddEditReviewDialogFragment(){
         this.mCurrentReview = new ProductReview();
     }
-    public static AddEditReviewFragment newInstance(String pProductId) {
+    public static AddEditReviewDialogFragment newInstance(String pProductId) {
         return newInstance(pProductId, null);
     }
-    public static AddEditReviewFragment newInstance(String pProductId, ProductReview productReview){
-        AddEditReviewFragment fragment = new AddEditReviewFragment();
+    public static AddEditReviewDialogFragment newInstance(String pProductId, ProductReview productReview){
+        AddEditReviewDialogFragment fragment = new AddEditReviewDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TAG_PRODUCT_ID, pProductId);
         bundle.putBoolean(TAG_NEW_REVIEW, true);
@@ -89,9 +86,10 @@ public class AddEditReviewFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if(LoginFragment.isRoboVMAccountEmailValid()) {
-            final AlertDialog dialog = (AlertDialog) getDialog();
-            if (dialog != null) {
+        final AlertDialog dialog = (AlertDialog) getDialog();
+        if (dialog != null) {
+            dialog.setCancelable(false);
+            if(LoginFragment.isRoboVMAccountEmailValid()) {
                 Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
                 positiveButton.setOnClickListener(v -> {
                     if (validateForm()) {
